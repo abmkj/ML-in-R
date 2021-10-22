@@ -1,20 +1,20 @@
-setwd( "/Users/Home/Files" )
+rm(list=ls())
+setwd( "/Desktop/" )
 
 # Loading and inspecting data ---------------------------------------------
 
-#Working with test data as an example
-dat &lt;- read.csv("track_records.csv")
+dat <- read.csv("track_records.csv")
 head(dat)
 
 #Basic processing
-rownames(dat) &lt;- dat$country
-dat &lt;- dat[,-8]
+rownames(dat) <- dat$country
+dat <- dat[,-8]
 head(dat)
 
 
 # Performing PCA ----------------------------------------------------------
 
-pca.out &lt;- prcomp(dat, scale = TRUE)
+pca.out <- prcomp(dat, scale = TRUE)
 names(pca.out)
 
 #Means and SDs of variables on original scale
@@ -23,30 +23,25 @@ pca.out$scale
 
 #PC Loadings
 pca.out$rotation
-pca.out$rotation[,1,drop=FALSE] #These are the variable loadings on the first PC
-sqrt( sum( pca.out$rotation[,1,drop=FALSE]^2 ) ) #These are all unit vectors
+pca.out$rotation[,1,drop=FALSE] 
+sqrt( sum( pca.out$rotation[,1,drop=FALSE]^2 ) )
 
 sum(pca.out$rotation[,1]^2)
 
 #PC Score Vectors (columns)
-pca.out$x #The first column tells you where each country lies along the first principal component
+pca.out$x 
 pca.out$x[1:5,1,drop=FALSE]
 
-var(pca.out$x[,1]) #Variance of score vector for first PC across countries
-var(pca.out$x[,2]) #Variance of score vector for second PC across countries
-
-
-# Biplot and Scree Plot ---------------------------------------------------
+var(pca.out$x[,1]) 
+var(pca.out$x[,2]) 
 
 #Biplot
 biplot(pca.out, col = c(4,2), scale = 0)
 
 #Proportion of variance explained by PCs
-pca.var &lt;- pca.out$sdev^2
-pve &lt;- pca.var/sum(pca.var)
+pca.var <- pca.out$sdev^2
+pve <- pca.var/sum(pca.var)
 pve
-
-#Total variance to explain
 sum(pca.var)
 
 #Scree plot
@@ -60,9 +55,5 @@ plot(cumsum(pve), xlab = "Principal Component",
      ylim = c(0,1), type = 'b', col = "blue")
 
 
-#Standardizaton important in this case
-head(dat)
-pca.out.ns &lt;- prcomp(dat, scale = FALSE)
-pca.out.ns$rotation
-biplot(pca.out.ns, col = c(4,2), scale = 0)
+
 

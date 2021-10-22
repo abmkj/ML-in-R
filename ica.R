@@ -1,31 +1,27 @@
+#######################################
 # Implementation of the Fast ICA algorithm developed by Hyvärinen (1999)
 #######################################
 
-fastICA_hyv &lt;- function(X, max_iters)
+ica <- functioN(X, iter_count)
 {
-  X &lt;- scale(X, center = TRUE, scale = FALSE) # Centering
-  
-  S &lt;- cov(X) #Covariance matrix
-  s &lt;- svd(S) #SVD
-  K &lt;- s$u %*% diag((sqrt(s$d))^(-1)) %*% t(s$v)
-  X &lt;- X %*% K
-  
-  N &lt;- dim(X)[1]
-  p &lt;- dim(X)[2]
-  
-  # Want W = X^{-1}S
-  W &lt;- matrix(runif(p^2), p, p)
-  e &lt;- matrix(1, N, 1)
-  
-  for (iter in 1:max_iters)
+  X <- scale(X, center = TRUE, scale = FALSE)
+  S <- cov(X)
+  s <- svd(S)
+  K <- s$u %*% diag((sqrt(s$d))^(-1)) %*% t(s$v)
+  X <- X %*% K
+  N <- dim(X)[1]
+  p <- dim(X)[2]
+  W <- matrix(runif(p^2), p, p)
+  e <- matrix(1, N, 1)
+  for (iter in 1:iter_count)
   {
     for (j in 1:p) {
-      W[, j] &lt;- 1/N * t(X) %*% tanh(X %*% W[, j]) - 
+      W[, j] <- 1/N * t(X) %*% tanh(X %*% W[, j]) - 
         1/N * (t(e) %*% (1 - tanh(X %*% W[, j])^2))[1] * W[, j]
     }
-    svd &lt;- svd(W)
-    W &lt;- svd$u %*% t(svd$v)
+    svd <- svd(W)
+    W <- svd$u %*% t(svd$v)
   }
-  S &lt;- X %*% W
+  S <- X %*% W
   return(S)
 }
