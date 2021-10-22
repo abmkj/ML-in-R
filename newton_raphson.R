@@ -1,42 +1,41 @@
-setwd( "/Users/Home/" )
 library(MASS)
 
 #Score function
-score_func&amp;lt;- function(beta_0,beta_1, sigma, X, Y){
-	part1&amp;lt;- (Y - beta_0 - beta_1*X)/sigma
-	part2&amp;lt;- ((Y - beta_0 - beta_1*X)/sigma)*X
-	part3&amp;lt;- -1/(2*sigma) + ((Y - beta_0 - beta_1*X)^2 )/(2*sigma^2)
-	out&amp;lt;- c(sum(part1), sum(part2), sum(part3))
+score_func = function(beta_0,beta_1, sigma, X, Y){
+	part1 = (Y - beta_0 - beta_1*X)/sigma
+	part2 = ((Y - beta_0 - beta_1*X)/sigma)*X
+	part3 = -1/(2*sigma) + ((Y - beta_0 - beta_1*X)^2 )/(2*sigma^2)
+	out= c(sum(part1), sum(part2), sum(part3))
 	return( out )
 	}
 	
 #Hessian function
-hes_func&amp;lt;- function(beta_0, beta_1, sigma, X, Y){
-	start&amp;lt;- matrix(0, nrow = 3, ncol = 3)
-	start[1,1]&amp;lt;- length(Y)/sigma
-	start[1,2]&amp;lt;- start[2,1]&amp;lt;- sum(X)/sigma
-	start[2,2]&amp;lt;-  sum(X^2)/sigma
-	start[3,3]&amp;lt;- length(Y)/(2 * sigma^2)
-	return(- start) #Returning the negative as usual for the Hessian
+hes_func = function(beta_0, beta_1, sigma, X, Y){
+	start = matrix(0, nrow = 3, ncol = 3)
+	start[1,1] = length(Y)/sigma
+	start[1,2] = start[2,1]- sum(X)/sigma
+	start[2,2] = sum(X^2)/sigma
+	start[3,3] = length(Y)/(2 * sigma^2)
+	return(-start) #Returning the negative as usual for the Hessian
 	}	
 
 #Newton-Raphson algorithm
-nr_func&amp;lt;- function(guess, X, Y){
-	c&amp;lt;- 0 
-	count&amp;lt;- 0 
-	old&amp;lt;- guess
+nr_func = function(guess, X, Y){
+	c = 0 
+	count = 0 
+	old = guess
 	while(c==0){
-	count&amp;lt;- count + 1
-		if(count&amp;gt;1){
-			old&amp;lt;- new
+	count = count + 1
+		if(count>=1){
+			old = new
 			}
-		part1&amp;lt;- score_func(old[1], old[2], old[3], X, Y)
-		part2&amp;lt;- hes_func(old[1], old[2], old[3], X, Y)
-		new&amp;lt;- old - solve(part2)%*%part1
-		if(count&amp;gt;2){ #Comparing old and new values
-			diff&amp;lt;- abs(old - new)
-			if(max(diff)&amp;lt;1e-5){
-				c&amp;lt;- 1
+		part1 = score_func(old[1], old[2], old[3], X, Y)
+		part2 = hes_func(old[1], old[2], old[3], X, Y)
+		new = old - solve(part2)%*%part1
+		if(count>=2){ #Comparing old and new values
+			diff = abs(old - new)
+			if(max(diff) <= 1e-5){
+				c = 1
 				}
 			}
 		}
@@ -44,26 +43,24 @@ nr_func&amp;lt;- function(guess, X, Y){
 }
 
 #Illustration
-X&amp;lt;- rnorm(1000)
-Y&amp;lt;- 0.5 + 0.25*X + rnorm(1000)	
-guess&amp;lt;- mvrnorm(1, c(0,0, 0), diag(1,3)) #Initial guess
-guess[3]&amp;lt;- exp(guess[3]) #Ensuring positive value
+X = rnorm(1000)
+Y = 0.5 + 0.25*X + rnorm(1000)	
+guess = mvrnorm(1, c(0,0, 0), diag(1,3)) #Initial guess
+guess[3] = exp(guess[3]) #Ensuring positive value
 
-get_params&amp;lt;- nr_func(rnorm(3, 0.5, sd= 0.1), X, Y)
-mle_linear&amp;lt;- function(x, y){
-out&amp;lt;- solve(t(x)%*%x)%*%t(x)%*%y
+get_params = nr_func(rnorm(3, 0.5, sd= 0.1), X, Y)
+
+mle_linear = function(x, y){
+out = solve(t(x)%*%x)%*%t(x)%*%y
 return(out)
 }
 
-mle_sigma&amp;lt;- function(x, y){
-coef&amp;lt;- mle_linear(x, y)
-preds&amp;lt;- x%*%coef
-diff&amp;lt;- y - preds
-ssr&amp;lt;- sum( (diff)^2)/length(y)
+mle_sigma = function(x, y){
+coef = mle_linear(x, y)
+preds = x%*%coef
+diff = y - preds
+ssr = sum( (diff)^2)/length(y)
 return(ssr)
 }
-analytic_sol&amp;lt;- c(mle_linear(cbind(1, X), Y), mle_sigma(cbind(1, X), Y))
-	
-
-	
+analytic_sol = c(mle_linear(cbind(1, X), Y), mle_sigma(cbind(1, X), Y))
 	
