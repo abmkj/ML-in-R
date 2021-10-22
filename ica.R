@@ -2,7 +2,7 @@
 # Implementation of the Fast ICA algorithm developed by Hyvärinen (1999)
 #######################################
 
-ica <- functioN(X, iter_count)
+ica <- function(X, iter_count)
 {
   X <- scale(X, center = TRUE, scale = FALSE)
   S <- cov(X)
